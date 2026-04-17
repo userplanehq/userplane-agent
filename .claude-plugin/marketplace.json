@@ -1,0 +1,17 @@
+{
+  "name": "userplane-marketplace",
+  "owner": {
+    "name": "wizenheimer",
+    "url": "https://github.com/wizenheimer"
+  },
+  "plugins": [
+    {
+      "name": "userplane",
+      "source": "./",
+      "description": "Userplane framework skills + workspace MCP + JTBD subagents (integrate, audit, debug, privacy).",
+      "version": "0.1.0",
+      "category": "observability",
+      "tags": ["userplane", "screen-recording", "mcp", "skills"]
+    }
+  ]
+}

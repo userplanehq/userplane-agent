@@ -1,0 +1,13 @@
+{
+  "name": "userplane",
+  "description": "Userplane screen recording: 14 framework skills, workspace + docs MCP servers, and JTBD subagents/commands for integrate, audit, debug, and privacy.",
+  "version": "0.1.0",
+  "author": {
+    "name": "wizenheimer",
+    "url": "https://github.com/wizenheimer"
+  },
+  "homepage": "https://github.com/wizenheimer/userplane-agent-skills",
+  "repository": "https://github.com/wizenheimer/userplane-agent-skills",
+  "license": "MIT",
+  "keywords": ["userplane", "screen-recording", "observability", "frontend"]
+}

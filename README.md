@@ -1,45 +1,49 @@
 # Userplane Agent Skills
 
-Agent skills for integrating [Userplane](https://userplane.io) screen recording SDK into web applications. These skills help AI coding agents (Claude Code, Cursor, etc.) guide developers through correct Userplane integration.
+[Userplane](https://userplane.io) screen recording SDK — as a Claude Code plugin and a skills pack for every other AI coding agent.
 
-## Skills
+Gives your agent 14 framework-specific integration guides, both production Userplane MCP servers, and purpose-built subagents/commands for **integrating**, **auditing**, **debugging**, and **privacy-proofing** a Userplane install — all from one install.
 
-| Skill | Description |
-|-------|-------------|
-| [userplane-react](skills/userplane-react/) | React (Vite) integration using a provider component |
-| [userplane-nextjs](skills/userplane-nextjs/) | Next.js App Router integration with SSR-safe client provider |
-| [userplane-vue](skills/userplane-vue/) | Vue 3 (Vite) integration using a Vue plugin |
-| [userplane-angular](skills/userplane-angular/) | Angular integration using APP_INITIALIZER |
-| [userplane-nuxt](skills/userplane-nuxt/) | Nuxt 3 integration using a browser-only client plugin |
-| [userplane-astro](skills/userplane-astro/) | Astro integration using client-side script blocks |
-| [userplane-sveltekit](skills/userplane-sveltekit/) | SvelteKit integration using onMount in root layout |
-| [userplane-tanstack-start](skills/userplane-tanstack-start/) | TanStack Start integration with search param schema |
-| [userplane-static-html](skills/userplane-static-html/) | Static HTML site integration (no build step) |
-| [userplane-web-sdk](skills/userplane-web-sdk/) | Web SDK API reference — initialization, recorder control, recording state |
-| [userplane-metadata-sdk](skills/userplane-metadata-sdk/) | Metadata SDK — attach user context to recordings |
-| [userplane-sensitive-data](skills/userplane-sensitive-data/) | Sensitive data redaction — blur configuration and third-party compatibility |
-| [userplane-cdn](skills/userplane-cdn/) | CDN installation — script placement, CSP, redirects, browser support |
-| [userplane-best-practices](skills/userplane-best-practices/) | Cross-cutting best practices for installation, SDK integration, metadata, and privacy |
+---
 
 ## Installation
 
-### Using the skills CLI (recommended)
+### Claude Code plugin (recommended for Claude Code)
+
+Registers skills + MCP + subagents + slash commands in one go.
+
+```
+# one-time: register this repo as a plugin marketplace
+/plugin marketplace add wizenheimer/userplane-agent-skills
+
+# install the plugin
+/plugin install userplane@userplane-marketplace
+```
+
+After install, verify:
+
+```
+/plugin          # userplane listed and enabled
+/mcp             # userplane-workspace and userplane-docs listed
+```
+
+### Skills CLI (for Cursor, Windsurf, and other agents)
+
+Installs the 14 skills into your agent's global skills directory. Works with any tool that consumes the open [Agent Skills](https://agentskills.io) standard.
 
 ```bash
 npx skills add wizenheimer/userplane-agent-skills
 ```
 
-This installs all Userplane skills and makes them available to your agent automatically.
+### Claude Code (manual — skills only, no plugin)
 
-### Claude Code (manual)
-
-Copy a skill into your Claude Code skills directory:
+Copy one skill:
 
 ```bash
-cp -r skills/userplane-react ~/.claude/skills/
+cp -r skills/userplane-nextjs ~/.claude/skills/
 ```
 
-Or copy all skills:
+…or all of them:
 
 ```bash
 cp -r skills/* ~/.claude/skills/
@@ -47,8 +51,129 @@ cp -r skills/* ~/.claude/skills/
 
 ### claude.ai Projects
 
-Upload the `SKILL.md` file from any skill directory as project knowledge.
+Upload any `skills/<name>/SKILL.md` as project knowledge.
 
-### Cursor / Other Agents
+### Cursor / other agents
 
-Add the `SKILL.md` content to your agent's context or rules file.
+Paste the relevant `SKILL.md` into your agent's rules / context file.
+
+---
+
+## Commands
+
+| Command | Job | Purpose |
+|---|---|---|
+| `/userplane:integrate` | Add Userplane to this app | Detect framework and wire up the matching install (provider, script, CSP, env) |
+| `/userplane:audit` | Verify my install is correct | Read-only PASS/FAIL checklist against the matching framework skill |
+| `/userplane:debug <id \| description>` | Root-cause a failing session | Fetch and analyze a recording via the workspace MCP |
+| `/userplane:privacy` | Check PII / privacy posture | Audit blur attrs, `setMetadata` leakage, CSP `frame-src` |
+
+Each command delegates to exactly one subagent (`integrate-agent`, `audit-agent`, `debug-agent`, `privacy-agent`) — no shared agents, no modes.
+
+---
+
+## Usage
+
+### Slash commands
+
+```
+/userplane:integrate
+/userplane:audit
+/userplane:debug rec_01HX2KYN
+/userplane:debug "Sarah's checkout failure yesterday"
+/userplane:privacy
+```
+
+**`/userplane:integrate`** detects your framework from `package.json` (Next.js, Nuxt, Angular, Vue, SvelteKit, Astro, TanStack Start, React/Vite, or static HTML), loads the matching skill, and writes the integration — provider component, script tag, env var, CSP headers. It finishes with a summary of files changed and the next step (usually: set your write key and restart the dev server). If Userplane is already installed, it tells you to run `/userplane:audit` instead.
+
+**`/userplane:audit`** is read-only. It checks your existing install against the matching framework skill and produces a PASS/FAIL checklist — provider wiring, script placement, SSR hazards, `setUser`/`setMetadata` usage, CSP headers, env var consistency — with file:line citations and a concrete diff for every failure.
+
+**`/userplane:debug`** accepts a recording ID or a natural-language description. With an ID, it resolves the workspace and fetches the recording directly via the workspace MCP. With a description ("Sarah's checkout failure yesterday"), it searches recordings by user and time range, confirms which one to analyze, then fetches console, network, and action data in parallel. It builds a correlated timeline, identifies the root cause, and proposes a fix with a code reference when the repo is accessible.
+
+**`/userplane:privacy`** scans the repo for privacy issues: missing `data-userplane-blur` attributes on PII-adjacent inputs, raw PII in `setMetadata` calls, CSP `frame-src` gaps for third-party iframes (Stripe, Auth0, etc.), and inline handlers that leak sensitive data into the DOM. It reports findings ranked by severity with file:line citations and concrete diffs.
+
+### Natural-language activation
+
+The 14 skills also activate automatically when a prompt matches — no slash command needed:
+
+- *"set up Userplane in this Astro site"* → `userplane-astro`
+- *"what's the setMetadata signature?"* → `userplane-metadata-sdk`
+- *"why is the recorder iframe blocked?"* → `userplane-cdn` + `userplane-sensitive-data`
+- *"what should I avoid when shipping Userplane to prod?"* → `userplane-best-practices`
+
+---
+
+## Skills
+
+### Framework integrations
+
+| Skill | Framework | Integration pattern |
+|---|---|---|
+| [userplane-react](skills/userplane-react/) | React (Vite) | Provider component |
+| [userplane-nextjs](skills/userplane-nextjs/) | Next.js (App Router) | SSR-safe client provider |
+| [userplane-vue](skills/userplane-vue/) | Vue 3 (Vite) | Vue plugin |
+| [userplane-angular](skills/userplane-angular/) | Angular | `APP_INITIALIZER` |
+| [userplane-nuxt](skills/userplane-nuxt/) | Nuxt 3 | Browser-only client plugin |
+| [userplane-astro](skills/userplane-astro/) | Astro | Client-side script blocks |
+| [userplane-sveltekit](skills/userplane-sveltekit/) | SvelteKit | `onMount` in root layout |
+| [userplane-tanstack-start](skills/userplane-tanstack-start/) | TanStack Start | Search-param schema |
+| [userplane-static-html](skills/userplane-static-html/) | Static HTML | No build step |
+
+### SDK references
+
+| Skill | Covers |
+|---|---|
+| [userplane-web-sdk](skills/userplane-web-sdk/) | Initialization, recorder control, recording state |
+| [userplane-metadata-sdk](skills/userplane-metadata-sdk/) | `setUser` / `setMetadata` — attach user context to recordings |
+
+### Cross-cutting guides
+
+| Skill | Covers |
+|---|---|
+| [userplane-cdn](skills/userplane-cdn/) | Script placement, CSP, redirects, browser support |
+| [userplane-sensitive-data](skills/userplane-sensitive-data/) | Blur config, third-party iframe compatibility |
+| [userplane-best-practices](skills/userplane-best-practices/) | Cross-cutting install, SDK, metadata, privacy |
+
+---
+
+## MCP servers
+
+Declared in `.mcp.json` and auto-loaded by the plugin.
+
+| Server | URL | Purpose |
+|---|---|---|
+| `userplane-workspace` | `https://api.userplane.io/mcp` | Workspaces, projects, links, domains, recordings + console/network/actions viewers. OAuth 2.1 (DCR). |
+| `userplane-docs` | `https://docs.userplane.io/mcp` | Documentation search. |
+
+**First call** opens a browser for OAuth. Tokens are stored by Claude Code. If a refresh silently fails, run `/mcp` to re-authenticate.
+
+---
+
+## What's inside the plugin
+
+```
+.claude-plugin/
+  plugin.json
+  marketplace.json
+.mcp.json                  # 2 HTTP MCP servers
+agents/                    # 4 subagents (1:1 with commands)
+  integrate-agent.md
+  audit-agent.md
+  debug-agent.md
+  privacy-agent.md
+commands/                  # 4 JTBD slash commands
+  integrate.md
+  audit.md
+  debug.md
+  privacy.md
+skills/                    # 14 skills (unchanged layout — skills.sh compatible)
+  userplane-react/
+  userplane-nextjs/
+  …
+```
+
+---
+
+## License
+
+MIT.
