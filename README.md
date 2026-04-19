@@ -14,7 +14,7 @@ Registers skills + MCP + subagents + slash commands in one go.
 
 ```
 # one-time: register this repo as a plugin marketplace
-/plugin marketplace add wizenheimer/userplane-agent-skills
+/plugin marketplace add userplanehq/userplane-agent
 
 # install the plugin
 /plugin install userplane@userplane-marketplace
@@ -32,7 +32,7 @@ After install, verify:
 Installs the 14 skills into your agent's global skills directory. Works with any tool that consumes the open [Agent Skills](https://agentskills.io) standard.
 
 ```bash
-npx skills add wizenheimer/userplane-agent-skills
+npx skills add userplanehq/userplane-agent
 ```
 
 ### Claude Code (manual — skills only, no plugin)

@@ -6,8 +6,13 @@
     "name": "wizenheimer",
     "url": "https://github.com/wizenheimer"
   },
-  "homepage": "https://github.com/wizenheimer/userplane-agent-skills",
-  "repository": "https://github.com/wizenheimer/userplane-agent-skills",
+  "homepage": "https://github.com/userplanehq/userplane-agent",
+  "repository": "https://github.com/userplanehq/userplane-agent",
   "license": "MIT",
-  "keywords": ["userplane", "screen-recording", "observability", "frontend"]
+  "keywords": [
+    "userplane",
+    "screen-recording",
+    "observability",
+    "frontend"
+  ]
 }
